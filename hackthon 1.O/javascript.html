@@ -1,0 +1,178 @@
+const CONFIG = {
+spreadsheetId: "1ZNsqkyHZU5964JqZ7ylBubCGqSodyx4MGBUg_rkbz7M",
+sheetName: "Registrations",
+driveFolderId: "1RHmsJfriCl8RYySYjOJt8Zqq8f_OvofD",
+};
+
+const SHEET_HEADERS = [
+"Team Lead",
+"Reg No",
+"Email",
+"Phone",
+"Member1",
+"Member2",
+"Member3",
+"Branch",
+"Payment Screenshot Link"
+];
+
+function doGet() {
+return jsonResponse_({
+success: true,
+message: "Hackthon-O-Heist backend is live."
+});
+}
+
+function doPost(e) {
+try {
+assertConfig_();
+
+if (!e || !e.parameter) {
+throw new Error("No form payload received.");
+}
+
+const payload = mapPayload_(e.parameter);
+validatePayload_(payload);
+
+const screenshotLink = uploadScreenshot_(payload);
+const sheet = getSheet_();
+
+sheet.appendRow([
+payload.teamLead,
+payload.regNo,
+payload.email,
+payload.phone,
+payload.member1,
+payload.member2,
+payload.member3,
+payload.branch,
+screenshotLink
+]);
+
+return jsonResponse_({
+success: true,
+message: "Registration saved successfully.",
+screenshotLink: screenshotLink
+});
+} catch (error) {
+return jsonResponse_({
+success: false,
+message: error.message || "Unexpected error while processing registration."
+});
+}
+}
+
+function assertConfig_() {
+if (
+CONFIG.spreadsheetId === "PASTE_SPREADSHEET_ID_HERE" ||
+CONFIG.driveFolderId === "PASTE_DRIVE_FOLDER_ID_HERE"
+) {
+throw new Error("Update the spreadsheetId and driveFolderId in backend.gs before deployment.");
+}
+}
+
+function mapPayload_(params) {
+return {
+teamLead: sanitizeText_(params.teamLead),
+regNo: sanitizeText_(params.regNo),
+email: sanitizeText_(params.email),
+phone: sanitizeText_(params.phone),
+member1: sanitizeText_(params.member1),
+member2: sanitizeText_(params.member2),
+member3: sanitizeText_(params.member3),
+branch: sanitizeText_(params.branch),
+paymentImageBase64: sanitizeBase64_(params.paymentImageBase64),
+paymentImageType: sanitizeText_(params.paymentImageType),
+paymentImageName: sanitizeFileName_(params.paymentImageName || "payment-proof.png")
+};
+}
+
+function validatePayload_(payload) {
+const requiredFields = [
+["teamLead", "Team lead name is required."],
+["regNo", "Registration number is required."],
+["email", "Email is required."],
+["phone", "Phone number is required."],
+["member1", "Member 1 is required."],
+["branch", "Branch is required."],
+["paymentImageBase64", "Payment screenshot is required."],
+["paymentImageType", "Payment screenshot type is required."]
+];
+
+requiredFields.forEach(function ([key, message]) {
+if (!payload[key]) {
+throw new Error(message);
+}
+});
+
+if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.email)) {
+throw new Error("Enter a valid email address.");
+}
+
+if (!/^[0-9]{10,15}$/.test(payload.phone)) {
+throw new Error("Enter a valid phone number.");
+}
+
+if (["image/jpeg", "image/png"].indexOf(payload.paymentImageType) === -1) {
+throw new Error("Only JPG and PNG payment screenshots are allowed.");
+}
+}
+
+function getSheet_() {
+const spreadsheet = SpreadsheetApp.openById(CONFIG.spreadsheetId);
+let sheet = spreadsheet.getSheetByName(CONFIG.sheetName);
+
+if (!sheet) {
+sheet = spreadsheet.insertSheet(CONFIG.sheetName);
+}
+
+ensureHeaders_(sheet);
+return sheet;
+}
+
+function ensureHeaders_(sheet) {
+const headerRange = sheet.getRange(1, 1, 1, SHEET_HEADERS.length);
+const existingHeaders = headerRange.getValues()[0];
+const isHeaderMissing = SHEET_HEADERS.some(function (header, index) {
+return existingHeaders[index] !== header;
+});
+
+if (isHeaderMissing) {
+headerRange.setValues([SHEET_HEADERS]);
+sheet.setFrozenRows(1);
+}
+}
+
+function uploadScreenshot_(payload) {
+const folder = DriveApp.getFolderById(CONFIG.driveFolderId);
+const extension = payload.paymentImageType === "image/png" ? "png" : "jpg";
+const timestamp = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "yyyyMMdd-HHmmss");
+const fileName = timestamp + "-" + payload.paymentImageName.replace(/\.[^.]+$/, "") + "." + extension;
+const bytes = Utilities.base64Decode(payload.paymentImageBase64);
+const blob = Utilities.newBlob(bytes, payload.paymentImageType, fileName);
+const file = folder.createFile(blob);
+
+file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+return file.getUrl();
+}
+
+function sanitizeText_(value) {
+return String(value || "").trim();
+}
+
+function sanitizeBase64_(value) {
+return String(value || "").replace(/\s/g, "").trim();
+}
+
+function sanitizeFileName_(value) {
+return String(value || "payment-proof")
+.trim()
+.replace(/[^a-zA-Z0-9._-]+/g, "-")
+.replace(/-+/g, "-");
+}
+
+function jsonResponse_(payload) {
+return ContentService
+.createTextOutput(JSON.stringify(payload))
+.setMimeType(ContentService.MimeType.JSON);
+}

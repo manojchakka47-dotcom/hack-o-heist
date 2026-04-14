@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hackthon-O-Heist Registration</title>
+    <meta name="description" content="Register your crew for Hackthon-O-Heist and upload payment proof.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --panel: rgba(8, 15, 18, 0.82);
+            --line: rgba(109, 255, 224, 0.28);
+            --text: #eefcf8;
+            --muted: #b1c9c2;
+            --cyan: #68ffe0;
+            --gold: #ffbf59;
+            --red: #ff6d7f;
+            --danger: #ff8ea0;
+            --success: #7dffbc;
+            --shadow: 0 24px 70px rgba(0, 0, 0, 0.4);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Rajdhani", sans-serif;
+            color: var(--text);
+            background:
+                linear-gradient(180deg, rgba(2, 5, 6, 0.12), rgba(1, 4, 5, 0.86)),
+                url("register-bg.jpg") center center / cover fixed no-repeat;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(circle at 78% 16%, rgba(0, 255, 210, 0.12), transparent 28%),
+                radial-gradient(circle at 16% 24%, rgba(255, 184, 46, 0.12), transparent 28%),
+                linear-gradient(125deg, rgba(3, 6, 8, 0.12), rgba(1, 3, 4, 0.74));
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .intro-overlay {
+            position: fixed;
+            inset: 0;
+            display: grid;
+            place-items: center;
+            background:
+                radial-gradient(circle at center, rgba(9, 26, 20, 0.22), rgba(0, 0, 0, 0.96)),
+                #000;
+            z-index: 50;
+            overflow: hidden;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+
+        .intro-overlay.is-hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .intro-streams {
+            position: absolute;
+            inset: 0;
+            opacity: 0.24;
+        }
+
+        .intro-stream {
+            position: absolute;
+            left: 0;
+            right: 0;
+            font-family: "Share Tech Mono", monospace;
+            font-size: clamp(0.72rem, 1vw, 0.98rem);
+            letter-spacing: 0.2em;
+            color: rgba(104, 255, 224, 0.44);
+            white-space: nowrap;
+            animation: drift 10s linear infinite;
+        }
+
+        .intro-stream:nth-child(2n) {
+            color: rgba(255, 191, 89, 0.24);
+            animation-direction: reverse;
+            animation-duration: 13s;
+        }
+
+        .intro-copy {
+            position: relative;
+            width: min(92vw, 1120px);
+            padding: 2rem;
+            text-align: center;
+            border: 1px solid rgba(104, 255, 224, 0.2);
+            background: rgba(0, 0, 0, 0.28);
+            box-shadow: 0 0 60px rgba(0, 0, 0, 0.45);
+        }
+
+        .intro-copy p {
+            margin: 0;
+        }
+
+        .intro-label {
+            margin-bottom: 0.8rem;
+            font-family: "Share Tech Mono", monospace;
+            font-size: 0.88rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5em;
+            color: var(--gold);
+        }
+
+        .intro-title {
+            font-family: "Orbitron", sans-serif;
+            font-size: clamp(2.2rem, 6vw, 5.4rem);
+            text-transform: uppercase;
+            letter-spacing: 0.18em;
+            color: var(--cyan);
+            text-shadow:
+                0 0 12px rgba(104, 255, 224, 0.86),
+                0 0 28px rgba(104, 255, 224, 0.32);
+            word-break: break-word;
+        }
+
+        .intro-subtitle {
+            margin-top: 1rem;
+            font-size: 1.05rem;
+            letter-spacing: 0.1em;
+            color: rgba(238, 252, 248, 0.8);
+        }
+
+        .page-shell {
+            position: relative;
+            z-index: 1;
+            padding: clamp(1.2rem, 3vw, 2rem) clamp(1rem, 4vw, 4rem) 4rem;
+        }
+
+        .topbar {
+            width: min(1200px, 100%);
+            margin: 0 auto 1.4rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .back-link,
+        .mission-tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.68rem 0.95rem;
+            border: 1px solid var(--line);
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 0.16em;
+            font-family: "Share Tech Mono", monospace;
+            font-size: 0.82rem;
+            background: rgba(4, 11, 13, 0.56);
+            color: var(--text);
+        }
+
+        .page-grid {
+            width: min(1200px, 100%);
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: minmax(300px, 0.92fr) minmax(0, 1.08fr);
+            gap: 1.4rem;
+        }
+
+        .panel {
+            border: 1px solid var(--line);
+            background:
+                linear-gradient(160deg, rgba(7, 14, 17, 0.9), rgba(7, 12, 14, 0.72));
+            box-shadow: var(--shadow);
+        }
+
+        .payment-panel,
+        .form-panel {
+            padding: clamp(1.2rem, 3vw, 2rem);
+        }
+
+        .section-kicker {
+            margin: 0 0 0.9rem;
+            font-family: "Share Tech Mono", monospace;
+            font-size: 0.86rem;
+            text-transform: uppercase;
+            letter-spacing: 0.32em;
+            color: var(--gold);
+        }
+
+        .panel h1,
+        .panel h2 {
+            margin: 0;
+            font-family: "Orbitron", sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .panel h1 {
+            font-size: clamp(1.9rem, 4vw, 3.1rem);
+            line-height: 1.08;
+        }
+
+        .panel h2 {
+            font-size: 1.34rem;
+        }
+
+        .subcopy,
+        .panel p,
+        .payment-meta li,
+        .field-note,
+        .status-message {
+            color: var(--muted);
+            line-height: 1.55;
+            font-size: 1rem;
+        }
+
+        .subcopy {
+            margin: 0.9rem 0 1.3rem;
+            max-width: 34rem;
+        }
+
+        .hero-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.7rem;
+            margin-top: 1rem;
+        }
+
+        .meta-chip {
+            padding: 0.52rem 0.74rem;
+            border: 1px solid rgba(104, 255, 224, 0.2);
+            background: rgba(255, 255, 255, 0.03);
+            font-family: "Share Tech Mono", monospace;
+            font-size: 0.78rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--cyan);
+        }
+
+        .qr-frame {
+            margin-top: 1.2rem;
+            padding: 1rem;
+            border: 1px solid rgba(104, 255, 224, 0.18);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .qr-image {
+            display: block;
+            width: 100%;
+            max-width: 360px;
+            margin: 0 auto;
+            border: 1px solid rgba(104, 255, 224, 0.16);
+            background: #fff;
+        }
+
+        .payment-callout {
+            margin: 1rem 0 0.5rem;
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            color: var(--cyan);
+            text-transform: uppercase;
+        }
+
+        .payment-meta {
+            display: grid;
+            gap: 0.75rem;
+            margin: 1.2rem 0 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .payment-meta li {
+            padding: 0.85rem 0.9rem;
+            border: 1px solid rgba(104, 255, 224, 0.16);
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        form {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 1rem;
+        }
+
+        .field {
+            display: grid;
+            gap: 0.45rem;
+        }
+
+        .field.full {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-family: "Share Tech Mono", monospace;
+            font-size: 0.8rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--text);
+        }
+
+        input {
+            width: 100%;
+            min-height: 54px;
+            padding: 0.9rem 1rem;
+            border: 1px solid rgba(104, 255, 224, 0.18);
+            background: rgba(6, 12, 15, 0.84);
+            color: var(--text);
+            font: inherit;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+        }
+
+        input::placeholder {
+            color: rgba(177, 201, 194, 0.6);
+        }
+
+        input:focus {
+            outline: none;
+            border-color: rgba(104, 255, 224, 0.72);
+            box-shadow: 0 0 0 3px rgba(104, 255, 224, 0.08);
+        }
+
+        input[type="file"] {
+            padding: 0.8rem;
+            cursor: pointer;
+        }
+
+        .field.is-invalid input {
+            border-color: rgba(255, 109, 127, 0.76);
+            box-shadow: 0 0 0 3px rgba(255, 109, 127, 0.08);
+        }
+
+        .field-error {
+            min-height: 1rem;
+            font-size: 0.92rem;
+            color: var(--danger);
+        }
+
+        .preview-card {
+            display: none;
+            gap: 0.8rem;
+            margin-top: 0.3rem;
+            padding: 0.9rem;
+            border: 1px solid rgba(104, 255, 224, 0.16);
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .preview-card.is-visible {
+            display: grid;
+            grid-template-columns: 120px 1fr;
+            align-items: center;
+        }
+
+        .preview-card img {
+            width: 120px;
+            aspect-ratio: 1;
+            object-fit: cover;
+            border: 1px solid rgba(104, 255, 224, 0.18);
+            background: rgba(4, 11, 13, 0.84);
+        }
+
+        .preview-meta strong {
+            display: block;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--cyan);
+        }
+
+        .preview-meta span {
+            display: block;
+            margin-top: 0.24rem;
+            color: var(--muted);
+            line-height: 1.45;
+        }
+
+        .status-message {
+            min-height: 1.4rem;
+            margin: 0;
+        }
+
+        .status-message.is-error {
+            color: var(--danger);
+        }
+
+        .status-message.is-success {
+            color: var(--success);
+        }
+
+        .submit-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.9rem;
+            align-items: center;
+            margin-top: 0.5rem;
+        }
+
+        .submit-button {
+            min-width: 230px;
+            min-height: 58px;
+            padding: 0.95rem 1.4rem;
+            border: 1px solid rgba(104, 255, 224, 0.34);
+            background: linear-gradient(135deg, rgba(104, 255, 224, 0.16), rgba(255, 109, 127, 0.12));
+            color: var(--text);
+            font-family: "Orbitron", sans-serif;
+            font-size: 0.96rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease, opacity 0.25s ease;
+            box-shadow:
+                0 0 0 1px rgba(255, 255, 255, 0.04) inset,
+                0 0 24px rgba(104, 255, 224, 0.14);
+        }
+
+        .submit-button:hover,
+        .submit-button:focus-visible {
+            outline: none;
+            transform: translateY(-2px);
+            border-color: rgba(104, 255, 224, 0.72);
+            box-shadow:
+                0 0 0 1px rgba(255, 255, 255, 0.08) inset,
+                0 0 34px rgba(104, 255, 224, 0.2);
+        }
+
+        .submit-button:disabled {
+            opacity: 0.72;
+            cursor: wait;
+            transform: none;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            display: none;
+            place-items: center;
+            background: rgba(0, 0, 0, 0.78);
+            z-index: 60;
+        }
+
+        .loading-overlay.is-visible {
+            display: grid;
+        }
+
+        .loading-card {
+            padding: 1.6rem 1.8rem;
+            border: 1px solid rgba(104, 255, 224, 0.24);
+            background: rgba(8, 15, 18, 0.92);
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+
+        .spinner {
+            width: 62px;
+            height: 62px;
+            margin: 0 auto 1rem;
+            border: 4px solid rgba(104, 255, 224, 0.16);
+            border-top-color: rgba(104, 255, 224, 0.96);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .loading-card p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 1rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        @keyframes drift {
+            from {
+                transform: translateX(-4%);
+            }
+
+            to {
+                transform: translateX(4%);
+            }
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @media (max-width: 980px) {
+            .page-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 720px) {
+            .topbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .form-grid,
+            .preview-card.is-visible {
+                grid-template-columns: 1fr;
+            }
+
+            .submit-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .submit-button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="intro-overlay" data-intro-overlay>
+        <div class="intro-streams" data-intro-streams></div>
+        <div class="intro-copy">
+            <p class="intro-label">Secure Intake</p>
+            <h1 class="intro-title" data-intro-title>HACKTHON-O-HEIST</h1>
+            <p class="intro-subtitle">Verifying crew credentials...</p>
+        </div>
+    </div>
+
+    <div class="loading-overlay" data-loading-overlay>
+        <div class="loading-card">
+            <div class="spinner" aria-hidden="true"></div>
+            <p>Encrypting registration packet...</p>
+        </div>
+    </div>
+
+    <div class="page-shell">
+        <div class="topbar">
+            <a class="back-link" href="index.html">Back To Mission Brief</a>
+            <span class="mission-tag">Crew Intake // Open</span>
+        </div>
+
+        <div class="page-grid">
+            <section class="panel payment-panel">
+                <p class="section-kicker">Registration Access</p>
+                <h1>Secure Your Team Slot</h1>
+                <p class="subcopy">Finish the payment, upload the screenshot, and send your crew dossier. Keep the
+                    details sharp. Missing intel gets flagged.</p>
+
+                <div class="hero-meta" aria-label="Quick registration details">
+                    <span class="meta-chip">24 Hours</span>
+                    <span class="meta-chip">VIIT Duvvada</span>
+                    <span class="meta-chip">Max 4 Members</span>
+                    <span class="meta-chip">₹800 Entry</span>
+                </div>
+
+                <div class="qr-frame">
+                    <img class="qr-image" src="scanner.png" alt="Payment QR code for Hackthon-O-Heist registration">
+                </div>
+
+                <p class="payment-callout">Pay ₹800 and upload screenshot</p>
+                <ul class="payment-meta">
+                    <li>Scan the QR, complete the payment, and keep the screenshot ready before filling the form.</li>
+                    <li>Member 1 is required. Member 2 and Member 3 are optional, keeping the team limit at four
+                        including the lead.</li>
+                    <li>Accepted proof formats: JPG and PNG only.</li>
+                </ul>
+            </section>
+
+            <section class="panel form-panel">
+                <p class="section-kicker">Crew Dossier</p>
+                <h2>Registration Form</h2>
+                <p class="subcopy">Fill every required field exactly as it should appear in the event records. The
+                    screenshot is uploaded along with the rest of the team details.</p>
+
+                <form id="registration-form" novalidate>
+                    <div class="form-grid">
+                        <div class="field">
+                            <label for="teamLead">Team Lead Name</label>
+                            <input id="teamLead" name="teamLead" type="text" placeholder="Enter team lead name"
+                                required>
+                            <span class="field-error" aria-live="polite"></span>
+                        </div>
+
+                        <div class="field">
+                            <label for="regNo">Registration Number</label>
+                            <input id="regNo" name="regNo" type="text" placeholder="25L31A46XX" required>
+                            <span class="field-error" aria-live="polite"></span>
+                        </div>
+
+                        <div class="field">
+                            <label for="email">Email</label>
+                            <input id="email" name="email" type="email" placeholder="Enter email address" required>
+                            <span class="field-error" aria-live="polite"></span>
+                        </div>
+
+                        <div class="field">
+                            <label for="phone">Phone Number</label>
+                            <input id="phone" name="phone" type="tel" inputmode="numeric"
+                                placeholder="Enter phone number" required>
+                            <span class="field-error" aria-live="polite"></span>
+                        </div>
+
+                        <div class="field">
+                            <label for="member1">Member 1</label>
+                            <input id="member1" name="member1" type="text" placeholder="Required member name" required>
+                            <span class="field-error" aria-live="polite"></span>
+                        </div>
+
+                        <div class="field">
+                            <label for="branch">Branch</label>
+                            <input id="branch" name="branch" type="text" placeholder="Enter branch" required>
+                            <span class="field-error" aria-live="polite"></span>
+                        </div>
+
+                        <div class="field">
+                            <label for="member2">Member 2</label>
+                            <input id="member2" name="member2" type="text" placeholder="Optional member name">
+                            <span class="field-error" aria-live="polite"></span>
+                        </div>
+
+                        <div class="field">
+                            <label for="member3">Member 3</label>
+                            <input id="member3" name="member3" type="text" placeholder="Optional member name">
+                            <span class="field-error" aria-live="polite"></span>
+                        </div>
+
+                        <div class="field full">
+                            <label for="paymentScreenshot">Upload Payment Screenshot</label>
+                            <input id="paymentScreenshot" name="paymentScreenshot" type="file"
+                                accept=".jpg,.jpeg,.png,image/png,image/jpeg" required>
+                            <span class="field-note">Accepted formats: JPG, JPEG, PNG.</span>
+                            <span class="field-error" aria-live="polite"></span>
+                            <div class="preview-card" id="preview-card">
+                                <img id="preview-image" alt="Preview of uploaded payment screenshot">
+                                <div class="preview-meta">
+                                    <strong>Payment Proof Ready</strong>
+                                    <span id="preview-name"></span>
+                                    <span id="preview-size"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p class="status-message" id="status-message" aria-live="polite"></p>
+                    <div class="submit-row">
+                        <button class="submit-button" type="submit" id="submit-button">Submit Registration</button>
+                    </div>
+                </form>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxYtCsQWZH8gC-raXJ5p7iueUA2wRASJEMi6JP9d2imIujjqpQloyWJBog3SmHOdcuA/exec";
+        const WHATSAPP_GROUP_URL = "https://chat.whatsapp.com/JgiehNBT4tZH3eadFulKcz?mode=gi_t";
+        const introOverlay = document.querySelector("[data-intro-overlay]");
+        const introTitle = document.querySelector("[data-intro-title]");
+        const introStreams = document.querySelector("[data-intro-streams]");
+        const form = document.getElementById("registration-form");
+        const fileInput = document.getElementById("paymentScreenshot");
+        const previewCard = document.getElementById("preview-card");
+        const previewImage = document.getElementById("preview-image");
+        const previewName = document.getElementById("preview-name");
+        const previewSize = document.getElementById("preview-size");
+        const statusMessage = document.getElementById("status-message");
+        const submitButton = document.getElementById("submit-button");
+        const loadingOverlay = document.querySelector("[data-loading-overlay]");
+
+        function buildIntroStreams() {
+            const fragments = [
+                "DOSSIER-CHECKSUM-VERIFIED",
+                "PAYLOAD-UPLINK-SECURE",
+                "INTAKE-PORT-LOCKED",
+                "VAULT-ENTRY-AUTH-PENDING",
+                "CREW-NODE-SCAN-ONLINE",
+                "PROOF-UPLOAD-GATE-READY"
+            ];
+
+            for (let index = 0; index < 22; index += 1) {
+                const line = document.createElement("div");
+                line.className = "intro-stream";
+                line.style.top = `${index * 4.5}%`;
+                line.style.animationDelay = `${index * -0.35}s`;
+                line.textContent = `${fragments[index % fragments.length]} // ${Math.random().toString(36).slice(2, 14).toUpperCase()} // ${Math.random().toString(36).slice(2, 14).toUpperCase()} //`;
+                introStreams.appendChild(line);
+            }
+        }
+
+        function playIntro() {
+            const target = "HACKTHON-O-HEIST";
+            const pool = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            let frame = 0;
+            const settle = Array.from(target).map((character, index) => character === "-" ? 0 : 10 + index * 3);
+
+            const timer = window.setInterval(() => {
+                frame += 1;
+                introTitle.textContent = Array.from(target).map((character, index) => {
+                    if (character === "-") {
+                        return "-";
+                    }
+
+                    return frame >= settle[index]
+                        ? character
+                        : pool[Math.floor(Math.random() * pool.length)];
+                }).join("");
+
+                if (frame > settle[settle.length - 1] + 10) {
+                    window.clearInterval(timer);
+                    window.setTimeout(() => introOverlay.classList.add("is-hidden"), 650);
+                }
+            }, 48);
+        }
+
+        function setStatus(message, type = "") {
+            statusMessage.textContent = message;
+            statusMessage.className = "status-message";
+
+            if (type) {
+                statusMessage.classList.add(`is-${type}`);
+            }
+        }
+
+        function setLoading(isLoading) {
+            submitButton.disabled = isLoading;
+            submitButton.textContent = isLoading ? "Submitting..." : "Submit Registration";
+            loadingOverlay.classList.toggle("is-visible", isLoading);
+        }
+
+        function clearFieldState(field) {
+            field.classList.remove("is-invalid");
+            const error = field.querySelector(".field-error");
+            if (error) {
+                error.textContent = "";
+            }
+        }
+
+        function setFieldError(field, message) {
+            field.classList.add("is-invalid");
+            const error = field.querySelector(".field-error");
+            if (error) {
+                error.textContent = message;
+            }
+        }
+
+        function validateFile(file) {
+            if (!file) {
+                return "Payment screenshot is required.";
+            }
+
+            const allowedTypes = ["image/jpeg", "image/png"];
+            if (!allowedTypes.includes(file.type)) {
+                return "Only JPG and PNG images are allowed.";
+            }
+
+            return "";
+        }
+
+        function validateForm() {
+            let isValid = true;
+            const requiredFields = Array.from(form.querySelectorAll("input[required]"));
+
+            form.querySelectorAll(".field").forEach(clearFieldState);
+            setStatus("");
+
+            requiredFields.forEach((input) => {
+                const field = input.closest(".field");
+
+                if (input.type === "file") {
+                    const errorMessage = validateFile(input.files[0]);
+                    if (errorMessage) {
+                        setFieldError(field, errorMessage);
+                        isValid = false;
+                    }
+                    return;
+                }
+
+                if (!input.value.trim()) {
+                    setFieldError(field, "This field is required.");
+                    isValid = false;
+                    return;
+                }
+
+                if (input.type === "email" && !input.validity.valid) {
+                    setFieldError(field, "Enter a valid email address.");
+                    isValid = false;
+                    return;
+                }
+
+                if (input.id === "phone" && !/^[0-9]{10,15}$/.test(input.value.trim())) {
+                    setFieldError(field, "Enter a valid phone number.");
+                    isValid = false;
+                }
+            });
+
+            return isValid;
+        }
+
+        function showPreview(file) {
+            const errorMessage = validateFile(file);
+            const field = fileInput.closest(".field");
+
+            if (errorMessage) {
+                previewCard.classList.remove("is-visible");
+                if (fileInput.files.length) {
+                    setFieldError(field, errorMessage);
+                }
+                return;
+            }
+
+            clearFieldState(field);
+            previewCard.classList.add("is-visible");
+            previewName.textContent = file.name;
+            previewSize.textContent = `${(file.size / 1024 / 1024).toFixed(2)} MB`;
+            previewImage.src = URL.createObjectURL(file);
+        }
+
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(String(reader.result).split(",")[1]);
+                reader.onerror = () => reject(new Error("Unable to read the payment screenshot."));
+                reader.readAsDataURL(file);
+            });
+        }
+
+        async function handleSubmit(event) {
+            event.preventDefault();
+
+            if (!validateForm()) {
+                setStatus("Fill all required fields correctly before submitting.", "error");
+                return;
+            }
+
+            if (APPS_SCRIPT_URL.includes("https://script.google.com/macros/s/AKfycbwONI1S86kUHj1hJ8fQ4pHwq0yYPzpGFHhDq9G-ws0/exce")) {
+                setStatus("Backend URL is not configured yet. Open register.html and replace the Apps Script URL before going live.", "error");
+                return;
+            }
+
+            const file = fileInput.files[0];
+
+            try {
+                setLoading(true);
+                setStatus("");
+
+                const formData = new FormData(form);
+                const paymentImageBase64 = await fileToBase64(file);
+                formData.append("paymentImageBase64", paymentImageBase64);
+                formData.append("paymentImageType", file.type);
+                formData.append("paymentImageName", file.name);
+
+                const response = await fetch(APPS_SCRIPT_URL, {
+                    method: "POST",
+                    body: formData,
+                    redirect: "follow"
+                });
+
+                const raw = await response.text();
+                let result = {};
+
+                try {
+                    result = raw ? JSON.parse(raw) : {};
+                } catch (error) {
+                    result = {};
+                }
+
+                if (!response.ok || result.success === false) {
+                    throw new Error(result.message || "Submission failed. Please try again.");
+                }
+
+                setStatus("Registration successful. Redirecting to the WhatsApp group...", "success");
+                window.alert("Registration Successful!");
+                window.location.href = "https://chat.whatsapp.com/JgiehNBT4tZH3eadFulKcz?mode=gi_t";
+            } catch (error) {
+                setStatus(error.message || "Something went wrong while submitting the form.", "error");
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        buildIntroStreams();
+        playIntro();
+
+        fileInput.addEventListener("change", () => {
+            const file = fileInput.files[0];
+            if (file) {
+                showPreview(file);
+            } else {
+                previewCard.classList.remove("is-visible");
+            }
+        });
+
+        form.addEventListener("submit", handleSubmit);
+    </script>
+</body>
+
+</html>

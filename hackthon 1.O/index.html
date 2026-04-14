@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hackthon-O-Heist</title>
+    <meta name="description"
+        content="Hackthon-O-Heist is a 24-hour cyber-heist themed hackathon at VIIT, Duvvada, Vizag.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg: #040810;
+            --ink: #eefbff;
+            --muted: #a1bcc6;
+            --line: rgba(110, 240, 255, 0.28);
+            --panel: rgba(7, 12, 20, 0.8);
+            --cyan: #67f4ff;
+            --red: #ff5f7d;
+            --gold: #ffc857;
+            --shadow: 0 24px 70px rgba(0, 0, 0, 0.45);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Rajdhani", sans-serif;
+            color: var(--ink);
+            background:
+                linear-gradient(180deg, rgba(1, 3, 8, 0.2), rgba(2, 4, 10, 0.86)),
+                url("heist-bg.jpg") center center / cover fixed no-repeat;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(circle at 18% 14%, rgba(0, 235, 255, 0.13), transparent 34%),
+                radial-gradient(circle at 84% 20%, rgba(255, 58, 100, 0.16), transparent 28%),
+                linear-gradient(125deg, rgba(2, 3, 8, 0.2), rgba(1, 3, 10, 0.8));
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .intro-overlay {
+            position: fixed;
+            inset: 0;
+            display: grid;
+            place-items: center;
+            background:
+                radial-gradient(circle at center, rgba(7, 22, 32, 0.24), rgba(0, 0, 0, 0.96)),
+                #000;
+            z-index: 50;
+            overflow: hidden;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+
+        .intro-overlay.is-hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .intro-streams {
+            position: absolute;
+            inset: 0;
+            opacity: 0.28;
+            pointer-events: none;
+        }
+
+        .intro-stream {
+            position: absolute;
+            left: 0;
+            right: 0;
+            font-family: "Share Tech Mono", monospace;
+            font-size: clamp(0.7rem, 1vw, 1rem);
+            letter-spacing: 0.22em;
+            color: rgba(103, 244, 255, 0.44);
+            white-space: nowrap;
+            animation: drift 11s linear infinite;
+        }
+
+        .intro-stream:nth-child(2n) {
+            color: rgba(255, 95, 125, 0.28);
+            animation-duration: 14s;
+            animation-direction: reverse;
+        }
+
+        .intro-copy {
+            position: relative;
+            width: min(92vw, 1180px);
+            padding: 2rem;
+            text-align: center;
+            border: 1px solid rgba(103, 244, 255, 0.22);
+            background: rgba(0, 0, 0, 0.26);
+            box-shadow: 0 0 60px rgba(0, 0, 0, 0.45);
+        }
+
+        .intro-label {
+            margin: 0 0 1rem;
+            font-family: "Share Tech Mono", monospace;
+            font-size: clamp(0.84rem, 1vw, 1rem);
+            letter-spacing: 0.54em;
+            text-transform: uppercase;
+            color: rgba(255, 200, 87, 0.86);
+        }
+
+        .intro-title {
+            margin: 0;
+            font-family: "Orbitron", sans-serif;
+            font-size: clamp(2.3rem, 7vw, 5.8rem);
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--cyan);
+            text-shadow:
+                0 0 12px rgba(103, 244, 255, 0.86),
+                0 0 28px rgba(31, 217, 255, 0.38),
+                0 0 50px rgba(31, 217, 255, 0.22);
+            word-break: break-word;
+        }
+
+        .intro-subtitle {
+            margin: 1rem 0 0;
+            font-size: clamp(1rem, 1.5vw, 1.35rem);
+            letter-spacing: 0.12em;
+            color: rgba(238, 251, 255, 0.8);
+        }
+
+        .page-shell {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero {
+            min-height: 100vh;
+            display: grid;
+            align-items: center;
+            padding: 4rem clamp(1.2rem, 4vw, 4rem);
+        }
+
+        .hero-grid {
+            width: min(1200px, 100%);
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.72fr);
+            gap: 1.6rem;
+            align-items: stretch;
+        }
+
+        .hero-copy,
+        .hero-side,
+        .section-card,
+        .footer-grid {
+            border: 1px solid var(--line);
+            background:
+                linear-gradient(155deg, rgba(7, 14, 24, 0.88), rgba(6, 10, 18, 0.72));
+            box-shadow: var(--shadow);
+        }
+
+        .hero-copy {
+            padding: clamp(1.6rem, 4vw, 3rem);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-copy::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(90deg, rgba(103, 244, 255, 0.08), transparent 24%),
+                linear-gradient(180deg, rgba(255, 95, 125, 0.06), transparent 24%);
+            pointer-events: none;
+        }
+
+        .hero-kicker,
+        .section-kicker {
+            margin: 0 0 1rem;
+            font-family: "Share Tech Mono", monospace;
+            letter-spacing: 0.34em;
+            text-transform: uppercase;
+            color: var(--gold);
+            font-size: 0.9rem;
+        }
+
+        h1,
+        h2,
+        h3 {
+            margin: 0;
+            font-family: "Orbitron", sans-serif;
+            text-transform: uppercase;
+        }
+
+        .hero-title {
+            font-size: clamp(2.7rem, 6vw, 5.4rem);
+            line-height: 0.92;
+            letter-spacing: 0.08em;
+            text-shadow:
+                0 0 18px rgba(103, 244, 255, 0.9),
+                0 0 42px rgba(31, 217, 255, 0.18);
+        }
+
+        .hero-title span {
+            display: block;
+            color: var(--red);
+            text-shadow:
+                0 0 12px rgba(255, 95, 125, 0.84),
+                0 0 34px rgba(255, 95, 125, 0.2);
+        }
+
+        .hero-lead {
+            margin: 1.3rem 0 0.7rem;
+            font-size: clamp(1.2rem, 2vw, 1.7rem);
+            font-weight: 700;
+            color: var(--cyan);
+            letter-spacing: 0.08em;
+        }
+
+        .hero-copy p {
+            margin: 0.6rem 0 0;
+            max-width: 42rem;
+            font-size: clamp(1.08rem, 1.5vw, 1.28rem);
+            line-height: 1.6;
+            color: var(--muted);
+        }
+
+        .cta-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 2rem;
+            align-items: center;
+        }
+
+        .cta-button,
+        .ghost-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 56px;
+            padding: 0.95rem 1.6rem;
+            border: 1px solid rgba(103, 244, 255, 0.36);
+            color: var(--ink);
+            text-decoration: none;
+            font-family: "Orbitron", sans-serif;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+            cursor: pointer;
+        }
+
+        .cta-button {
+            background: linear-gradient(135deg, rgba(103, 244, 255, 0.16), rgba(255, 95, 125, 0.14));
+            box-shadow:
+                0 0 0 1px rgba(255, 255, 255, 0.04) inset,
+                0 0 24px rgba(103, 244, 255, 0.16);
+        }
+
+        .ghost-button {
+            background: rgba(8, 14, 24, 0.52);
+            color: var(--muted);
+        }
+
+        .cta-button:hover,
+        .cta-button:focus-visible,
+        .ghost-button:hover,
+        .ghost-button:focus-visible {
+            transform: translateY(-2px);
+            outline: none;
+            border-color: rgba(103, 244, 255, 0.72);
+            box-shadow:
+                0 0 0 1px rgba(255, 255, 255, 0.08) inset,
+                0 0 34px rgba(103, 244, 255, 0.24);
+        }
+
+        .hero-side {
+            display: grid;
+            grid-template-rows: auto auto 1fr;
+            gap: 1rem;
+            padding: 1.6rem;
+            align-content: start;
+        }
+
+        .mission-chip {
+            display: inline-flex;
+            width: fit-content;
+            padding: 0.45rem 0.8rem;
+            border: 1px solid rgba(255, 95, 125, 0.4);
+            background: rgba(255, 95, 125, 0.08);
+            font-family: "Share Tech Mono", monospace;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--red);
+            font-size: 0.8rem;
+        }
+
+        .side-title {
+            font-size: 1.45rem;
+            letter-spacing: 0.08em;
+            line-height: 1.2;
+        }
+
+        .side-list {
+            display: grid;
+            gap: 0.8rem;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .side-item {
+            padding: 0.95rem 1rem;
+            border: 1px solid rgba(103, 244, 255, 0.18);
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .side-item strong {
+            display: block;
+            font-size: 1rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--cyan);
+        }
+
+        .side-item span {
+            display: block;
+            margin-top: 0.2rem;
+            color: var(--muted);
+            font-size: 1rem;
+            line-height: 1.4;
+        }
+
+        .section {
+            padding: 0 clamp(1.2rem, 4vw, 4rem) 4rem;
+        }
+
+        .section-inner {
+            width: min(1200px, 100%);
+            margin: 0 auto;
+            display: grid;
+            gap: 1.2rem;
+        }
+
+        .section-card {
+            padding: clamp(1.4rem, 3vw, 2.1rem);
+        }
+
+        .section-title {
+            font-size: clamp(1.6rem, 3vw, 2.5rem);
+            letter-spacing: 0.08em;
+            margin-top: 0.35rem;
+        }
+
+        .section-description {
+            max-width: 52rem;
+            margin: 0.85rem 0 0;
+            font-size: 1.08rem;
+            line-height: 1.65;
+            color: var(--muted);
+        }
+
+        .detail-grid,
+        .join-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 1rem;
+            margin-top: 1.4rem;
+        }
+
+        .detail-card,
+        .join-card {
+            min-height: 180px;
+            padding: 1.1rem;
+            border: 1px solid rgba(103, 244, 255, 0.18);
+            background:
+                linear-gradient(170deg, rgba(11, 17, 28, 0.88), rgba(8, 12, 20, 0.72));
+            position: relative;
+            overflow: hidden;
+        }
+
+        .detail-card::before,
+        .join-card::before {
+            content: "";
+            position: absolute;
+            inset: auto auto 0 0;
+            width: 68px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--cyan), transparent);
+        }
+
+        .detail-card h3,
+        .join-card h3 {
+            font-size: 1rem;
+            letter-spacing: 0.12em;
+            color: var(--cyan);
+        }
+
+        .detail-card p,
+        .join-card p {
+            margin: 0.7rem 0 0;
+            color: var(--muted);
+            font-size: 1rem;
+            line-height: 1.55;
+        }
+
+        .detail-index,
+        .join-index {
+            display: inline-flex;
+            margin-bottom: 0.9rem;
+            font-family: "Share Tech Mono", monospace;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: rgba(255, 95, 125, 0.92);
+            font-size: 0.84rem;
+        }
+
+        footer {
+            padding: 0 clamp(1.2rem, 4vw, 4rem) 3.2rem;
+        }
+
+        .footer-grid {
+            width: min(1200px, 100%);
+            margin: 0 auto;
+            padding: clamp(1.4rem, 3vw, 2rem);
+            display: grid;
+            gap: 1.2rem;
+            grid-template-columns: minmax(0, 1.3fr) minmax(0, 0.9fr);
+        }
+
+        .footer-title {
+            font-size: 1.5rem;
+            letter-spacing: 0.08em;
+        }
+
+        .footer-copy,
+        .contact-line {
+            margin: 0.45rem 0 0;
+            color: var(--muted);
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .contact-line strong {
+            color: var(--ink);
+            font-weight: 700;
+        }
+
+        .contact-line a {
+            color: var(--cyan);
+            text-decoration: none;
+        }
+
+        .contact-line a:hover,
+        .contact-line a:focus-visible {
+            text-decoration: underline;
+            outline: none;
+        }
+
+        @keyframes drift {
+            from {
+                transform: translateX(-3%);
+            }
+
+            to {
+                transform: translateX(3%);
+            }
+        }
+
+        @media (max-width: 980px) {
+
+            .hero-grid,
+            .footer-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero {
+                padding-top: 5.4rem;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .intro-copy {
+                padding: 1.6rem 1rem;
+            }
+
+            .intro-title {
+                letter-spacing: 0.12em;
+            }
+
+            .cta-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .cta-button,
+            .ghost-button {
+                width: 100%;
+            }
+
+            .detail-grid,
+            .join-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="intro-overlay" data-intro-overlay>
+        <div class="intro-streams" data-intro-streams></div>
+        <div class="intro-copy">
+            <p class="intro-label">Firewall Sequence</p>
+            <h1 class="intro-title" data-intro-title>HACKTHON-O-HEIST</h1>
+            <p class="intro-subtitle">Decrypting the vault...</p>
+        </div>
+    </div>
+
+    <div class="page-shell">
+        <section class="hero">
+            <div class="hero-grid">
+                <div class="hero-copy">
+                    <p class="hero-kicker">Mission Brief</p>
+                    <h1 class="hero-title">HACKTHON<span>-O-</span>HEIST</h1>
+                    <p class="hero-lead">The Heist Begins...</p>
+                    <p>Not everyone gets in. Only the sharpest minds escape.</p>
+                    <p>Step into a 24-hour cyber-heist where ideas become exploits, code becomes leverage, and your team
+                        races the clock to crack real-world problems before the vault seals shut.</p>
+                    <div class="cta-row">
+                        <a class="cta-button" href="register.html">Enter The Heist</a>
+                        <a class="ghost-button" href="#event-details">View Mission Intel</a>
+                    </div>
+                </div>
+
+                <aside class="hero-side" aria-label="Quick mission facts">
+                    <span class="mission-chip">Access Level // Open</span>
+                    <h2 class="side-title">Only the quickest minds make it out with the prize.</h2>
+                    <ul class="side-list">
+                        <li class="side-item">
+                            <strong>24 Hours</strong>
+                            <span>Non-stop build sprint with high-pressure, real-time problem solving.</span>
+                        </li>
+                        <li class="side-item">
+                            <strong>Max 4 Members</strong>
+                            <span>Assemble your tightest crew and move with precision.</span>
+                        </li>
+                        <li class="side-item">
+                            <strong>Cyber-Heist Theme</strong>
+                            <span>Dark cinematic energy, mission briefs, and high-stakes execution.</span>
+                        </li>
+                    </ul>
+                </aside>
+            </div>
+        </section>
+
+        <section class="section" id="event-details">
+            <div class="section-inner">
+                <div class="section-card">
+                    <p class="section-kicker">Event Details</p>
+                    <h2 class="section-title">Operation Intel</h2>
+                    <p class="section-description">Everything your crew needs before infiltration. The experience is
+                        designed to be intense, collaborative, and rewarding from the very first mission drop to the
+                        final pitch.</p>
+                    <div class="detail-grid">
+                        <article class="detail-card">
+                            <span class="detail-index">01</span>
+                            <h3>24 Hours Hackathon</h3>
+                            <p>An immersive one-day build marathon where every minute counts.</p>
+                        </article>
+                        <article class="detail-card">
+                            <span class="detail-index">02</span>
+                            <h3>VIIT, Duvvada, Vizag</h3>
+                            <p>The vault opens on campus for teams ready to ship under pressure.</p>
+                        </article>
+                        <article class="detail-card">
+                            <span class="detail-index">03</span>
+                            <h3>Max 4 Members</h3>
+                            <p>Keep the squad lean, coordinated, and battle-ready.</p>
+                        </article>
+                        <article class="detail-card">
+                            <span class="detail-index">04</span>
+                            <h3>May 2nd Week</h3>
+                            <p>Tentative mission window. Final briefing lands after registration.</p>
+                        </article>
+                        <article class="detail-card">
+                            <span class="detail-index">05</span>
+                            <h3>Swags, Food, Certificates</h3>
+                            <p>Expect essentials, rewards, and proof that your crew made the cut.</p>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-inner">
+                <div class="section-card">
+                    <p class="section-kicker">Why Join</p>
+                    <h2 class="section-title">Why This Heist Matters</h2>
+                    <p class="section-description">This is more than a competition. It is a chance to build fast, think
+                        sharply, and prove your team can solve problems that feel close to the real world.</p>
+                    <div class="join-grid">
+                        <article class="join-card">
+                            <span class="join-index">01</span>
+                            <h3>Cybersecurity Challenges</h3>
+                            <p>Tackle problem statements inspired by practical, high-impact security scenarios instead
+                                of recycled toy ideas.</p>
+                        </article>
+                        <article class="join-card">
+                            <span class="join-index">02</span>
+                            <h3>Collaboration Under Pressure</h3>
+                            <p>Work like a real response team, splitting roles, syncing decisions, and shipping with
+                                urgency.</p>
+                        </article>
+                        <article class="join-card">
+                            <span class="join-index">03</span>
+                            <h3>Resume-Worthy Projects</h3>
+                            <p>Leave with a stronger portfolio piece, sharper storytelling, and something concrete to
+                                show recruiters.</p>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            <div class="footer-grid">
+                <div>
+                    <p class="section-kicker">Contact</p>
+                    <h2 class="footer-title">Mission Control</h2>
+                    <p class="footer-copy">Reach out for event coordination, registration help, or team-level
+                        clarifications before the vault doors close.</p>
+                </div>
+                <div>
+                    <p class="contact-line"><strong>FACULTY COORDINATORS:</strong></p>
+                    <p class="contact-line"><strong>Dr. Rohit</strong></p>
+                    <p class="contact-line"><strong>STUDENT COORDINATORS:</strong></p>
+                    <p class="contact-line"><strong>Sanjay:</strong> <a href="tel:9849349522">9849349522</a></p>
+                    <p class="contact-line"><strong>Jayram:</strong> <a href="tel:9390239827">9390239827</a></p>
+                    <p class="contact-line"><a
+                            href="mailto:vignancybersecurity@gmail.com">vignancybersecurity@gmail.com</a></p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        const overlay = document.querySelector("[data-intro-overlay]");
+        const introTitle = document.querySelector("[data-intro-title]");
+        const introStreams = document.querySelector("[data-intro-streams]");
+        const targetText = "HACKTHON-O-HEIST";
+        const scramblePool = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+        function buildCodeStreams() {
+            const fragments = [
+                "ALPHA9XJ2-ENTRY-PORT-LOCK",
+                "VAULT-DOOR-BYPASS-0041",
+                "PACKET-SHADOW-TRACE-8QX",
+                "SECTOR-KEY-OVERRIDE-77",
+                "PROXY-HANDSHAKE-FALSE-NEGATIVE",
+                "BREACH-MAP-REROUTE-17A",
+                "ACCESS-NODE-REWRITE-503"
+            ];
+
+            for (let index = 0; index < 24; index += 1) {
+                const line = document.createElement("div");
+                line.className = "intro-stream";
+                line.style.top = `${index * 4.2}%`;
+                line.style.animationDelay = `${index * -0.4}s`;
+                line.textContent = `${fragments[index % fragments.length]} // ${Math.random().toString(36).slice(2, 14).toUpperCase()} // ${Math.random().toString(36).slice(2, 14).toUpperCase()} //`;
+                introStreams.appendChild(line);
+            }
+        }
+
+        function playIntro() {
+            let frame = 0;
+            const settleFrames = Array.from(targetText).map((character, index) => {
+                if (character === "-") {
+                    return 0;
+                }
+
+                return 12 + index * 3;
+            });
+
+            const timer = window.setInterval(() => {
+                frame += 1;
+
+                const current = Array.from(targetText).map((character, index) => {
+                    if (character === "-") {
+                        return "-";
+                    }
+
+                    if (frame >= settleFrames[index]) {
+                        return character;
+                    }
+
+                    return scramblePool[Math.floor(Math.random() * scramblePool.length)];
+                }).join("");
+
+                introTitle.textContent = current;
+
+                if (frame > settleFrames[settleFrames.length - 1] + 12) {
+                    window.clearInterval(timer);
+                    window.setTimeout(() => {
+                        overlay.classList.add("is-hidden");
+                    }, 700);
+                }
+            }, 50);
+        }
+
+        buildCodeStreams();
+        playIntro();
+    </script>
+</body>
+
+</html>
